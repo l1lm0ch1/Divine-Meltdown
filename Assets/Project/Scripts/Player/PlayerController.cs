@@ -1,4 +1,5 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -6,6 +7,8 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float mouseSensitivity;
     [SerializeField] private Transform playerBody;
+    [SerializeField] private CinemachineCamera cinemachineCamera;
+    private CinemachinePanTilt panTilt;
 
     public static event Action<int> OnHealthChanged;
 
@@ -33,6 +36,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Time.timeScale = 1f;
         sceneIndex = SceneManager.GetActiveScene().buildIndex;
+        panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
     }
 
     private void Update()
@@ -52,8 +56,10 @@ public class PlayerController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -25f, 25f);
 
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         playerBody.Rotate(Vector3.up * mouseX);
+
+        panTilt.TiltAxis.Value = xRotation;
+        panTilt.PanAxis.Value = playerBody.eulerAngles.y;
     }
 
     private void HandleInteractions()
