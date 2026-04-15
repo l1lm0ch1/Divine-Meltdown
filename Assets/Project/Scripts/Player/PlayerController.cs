@@ -1,14 +1,14 @@
 using System;
-using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Cinemachine;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float mouseSensitivity;
-    [SerializeField] private Transform playerBody;
-    [SerializeField] private CinemachineCamera cinemachineCamera;
-    private CinemachinePanTilt panTilt;
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private Transform cameraTarget;
+    [SerializeField] private float minVerticalAngle = -30f;
+    [SerializeField] private float maxVerticalAngle = 60f;
 
     public static event Action<int> OnHealthChanged;
 
@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private float xRotation = 0f;
+    private float verticalAngle = 0f;
     private bool movementEnabled = true;
     private PinInteractable pinInRange;
     private Shield shieldInRange;
@@ -36,7 +36,6 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Time.timeScale = 1f;
         sceneIndex = SceneManager.GetActiveScene().buildIndex;
-        panTilt = cinemachineCamera.GetComponent<CinemachinePanTilt>();
     }
 
     private void Update()
@@ -44,22 +43,20 @@ public class PlayerController : MonoBehaviour
         if (!movementEnabled)
             return;
 
-        HandleMouseLook();
+        HandleCameraRotation();
         HandleInteractions();
     }
 
-    private void HandleMouseLook()
+    private void HandleCameraRotation()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -25f, 25f);
+        verticalAngle -= mouseY;
+        verticalAngle = Mathf.Clamp(verticalAngle, minVerticalAngle, maxVerticalAngle);
 
-        playerBody.Rotate(Vector3.up * mouseX);
-
-        panTilt.TiltAxis.Value = xRotation;
-        panTilt.PanAxis.Value = playerBody.eulerAngles.y;
+        cameraTarget.position = transform.position;
+        cameraTarget.rotation = Quaternion.Euler(verticalAngle, cameraTarget.eulerAngles.y + mouseX, 0f);
     }
 
     private void HandleInteractions()
@@ -113,5 +110,10 @@ public class PlayerController : MonoBehaviour
     public bool GetMovementState()
     {
         return movementEnabled;
+    }
+
+    public Transform GetCameraTarget()
+    {
+        return cameraTarget;
     }
 }

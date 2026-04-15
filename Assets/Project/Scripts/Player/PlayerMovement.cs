@@ -12,26 +12,30 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float sprintSpeed = 10f;
     [SerializeField] private float gravity = -12f;
     [SerializeField] private float jumpHeight = 1f;
-    [SerializeField] private float groundDistance = 0.01f;
+    [SerializeField] private float groundDistance = 0.3f;
+    [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private float turnSpeed = 120f;
 
     private Vector3 velocity;
     private bool isGrounded;
     private bool isJumping;
     private float currentSpeed;
+    private Transform cameraTarget;
 
     private void Start()
     {
         currentSpeed = baseSpeed;
+        cameraTarget = playerController.GetCameraTarget();
     }
 
     private void Update()
     {
         if (!playerController.GetMovementState())
         {
-            animator.SetBool("isWalking", false);
-            animator.SetBool("isJogging", false);
+            animator.SetFloat("speed", 0f);
             animator.SetBool("isJumping", false);
             animator.SetBool("isFalling", false);
+            animator.SetBool("isGrounded", true);
             return;
         }
 
@@ -44,11 +48,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleGroundCheck()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isGrounded = controller.isGrounded;
 
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -3f;
+            isJumping = false;
             animator.SetBool("isGrounded", true);
             animator.SetBool("isJumping", false);
             animator.SetBool("isFalling", false);
@@ -57,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetBool("isGrounded", false);
 
-            if (isJumping && velocity.y < 0)
+            if (velocity.y < -2f)
             {
                 animator.SetBool("isJumping", false);
                 animator.SetBool("isFalling", true);
@@ -71,10 +76,29 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
 
-        Vector3 move = transform.right * x + transform.forward * z;
-        controller.Move(move * currentSpeed * Time.deltaTime);
+        Vector3 cameraForward = cameraTarget.forward;
+        Vector3 cameraRight = cameraTarget.right;
 
-        animator.SetBool("isWalking", x != 0 || z != 0);
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        Vector3 move = (cameraForward * z + cameraRight * x).normalized;
+
+        if (move.magnitude > 0.1f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                720f * Time.deltaTime
+            );
+        }
+
+        float speedValue = move.magnitude * (currentSpeed / sprintSpeed);
+        animator.SetFloat("speed", speedValue, 0.1f, Time.deltaTime);
+        controller.Move(move * currentSpeed * Time.deltaTime);
     }
 
     private void HandleJump()
@@ -90,15 +114,9 @@ public class PlayerMovement : MonoBehaviour
     private void HandleSprint()
     {
         if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
             currentSpeed = sprintSpeed;
-            animator.SetBool("isJogging", true);
-        }
         else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
             currentSpeed = baseSpeed;
-            animator.SetBool("isJogging", false);
-        }
     }
 
     private void ApplyGravity()
