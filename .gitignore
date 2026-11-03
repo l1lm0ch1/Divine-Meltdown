@@ -7,31 +7,16 @@
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
 /[Aa]rtifacts/
-.utmp/
-
-# Memory and recordings
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
+.utmp/
+*_BurstDebugInformation_DoNotShip/
 
-# Mono
-mono_crash.*
-
-# Crash reports
-sysinfo.txt
-
-# IDE
-.vs/
-.gradle/
-*.DotSettings.user
-ExportedObj/
-.consulo/
-
-# Generated project files
+# Unity generated project files
 *.csproj
 *.unityproj
 *.sln
 *.suo
-*.tmp
 *.user
 *.userprefs
 *.pidb
@@ -41,45 +26,51 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
-
-# Meta files for generated content
+*.tmp
 *.pidb.meta
 *.pdb.meta
 *.mdb.meta
+ExportedObj/
 
-# Blender
-*.blend1
-*.blend1.meta
+# Crash reports and logs
+sysinfo.txt
+mono_crash.*
+crashlytics-build.properties
+*.log
 
-# Build outputs
-*.apk
-*.aab
+# Test Runner
+InitTestScene*.unity*
+/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# JetBrains Rider
+.idea/
+.fleet/
+*.DotSettings.user
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Visual Studio and VS Code
+.vs/
+.vscode/
+
+# Other IDEs and tools
+.gradle/
+.consulo/
+
+# Blender backups
+*.blend[0-9]*
+*.blend[0-9]*.meta
+*.blend@
+*.blend@.meta
+
+# Packaged and built output
 *.unitypackage
 *.unitypackage.meta
 *.app
 
-# Logs
-*.log
-
-# Crashlytics
-crashlytics-build.properties
-
-# TestRunner
-InitTestScene*.unity*
-/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
-
-# Addressables
-/ServerData
-/[Aa]ssets/StreamingAssets/aa*
-/[Aa]ssets/AddressableAssetsData/link.xml*
-/[Aa]ssets/Addressables_Temp*
-/[Aa]ssets/AddressableAssetsData/*/*.bin*
-
-# Visual Scripting
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers
-/[Aa]ssets/Unity.VisualScripting.Generated/VisualScripting.Core/Property Providers.meta
-
-# JetBrains Rider
-/[Aa]ssets/Plugins/Editor/JetBrains*
+# Operating system
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+*.swp
